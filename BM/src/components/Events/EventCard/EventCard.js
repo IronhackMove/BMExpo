@@ -15,7 +15,7 @@ export default class EventCard extends Component {
         <Image
           style={styles.image}
           resizeMode="cover"
-          source={require("../../../images/tech.jpg")}
+          source={require("../../resources/images/tech.jpg")}
         />
         <Text style={styles.name}>{this.props.item.name}</Text>
       </View>

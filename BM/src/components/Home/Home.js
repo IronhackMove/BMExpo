@@ -8,14 +8,16 @@ import {
   StyleSheet,
   View,
   TouchableHighlight,
-  FlatList,
+  Image,
   AsyncStorage,
-  ActivityIndicator,
   Dimensions
 } from "react-native";
 import { Text, Button } from "react-native-elements";
 import EventCard from "../Events/EventCard";
 import EventModal from "../Events/EventModal/EventModal";
+import { Days, meetupsIfError } from "../utils/utils";
+
+var moment = require("moment");
 
 function wp(percentage) {
   const value = (percentage * viewportWidth) / 100;
@@ -82,6 +84,7 @@ export default class Home extends React.Component {
   };
 
   loadPosition = async () => {
+
     try {
       const token = await AsyncStorage.getItem("userToken");
       const position = await this.getCurrentPosition();
@@ -115,6 +118,7 @@ export default class Home extends React.Component {
         });
       });
 
+      joinMeetups.unshift({});
       console.log(joinMeetups);
 
       this.setState({
@@ -123,11 +127,12 @@ export default class Home extends React.Component {
         location: position.coords,
         user: userProfile.data,
         events: joinMeetups,
-        loadingContent: false,
-        buttonRefresh: false,
+        loadingContent: false
       });
     } catch (error) {
-      console.log(error);
+      console.log("ha petado");
+      this.setState({loadingContent: false})
+      // console.log(error);
     }
   };
 
@@ -152,32 +157,65 @@ export default class Home extends React.Component {
   // );
 
   _renderItem({ item, index }) {
+    console.log();
+
     return (
       <View style={styles.slide}>
-        <View style={styles.eventDate}>
-          <View style={styles.eventDay}>
-            <Text style={styles.text}>{item.local_date}</Text>
-          </View>
-          <View style={styles.eventHour}>
-            <Text style={styles.text}>{item.local_time}</Text>
-          </View>
-        </View>
-
-        <Image
-          style={{ width: wp(85), height: wp(140) }}
-          source={{ uri: `${item.image}` }}
-        />
-
         <View>
-          <Text style={styles.text}>{item.venue.city}</Text>
-          <Text style={styles.text}>{item.venue.address_1}</Text>
-        </View>
-        <View style={styles.eventName}>
-          <Text>{item.name}</Text>
+          <View>
+            {item.local_date ? (
+              <View style={styles.eventDate}>
+                <View style={styles.eventDay}>
+                  <Text style={styles.text}>
+                    {Days[moment(item.local_date).day()]}
+                  </Text>
+                  <Text style={styles.text}>
+                    {item.local_date ? item.local_date : ""}
+                  </Text>
+                </View>
+                <View style={styles.eventHour}>
+                  <Text style={styles.text}>Hour</Text>
+                  <Text style={styles.text}>
+                    {item.local_time ? item.local_time : ""}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+
+          <Image
+            style={{ width: wp(85), height: wp(120) }}
+            source={item.image}
+          />
+
+          {item.venue ? (
+            <View>
+              <Text style={styles.text}>
+                {item.venue ? item.venue.address_1 : "No adress"}
+              </Text>
+            </View>
+          ) : (
+            <View />
+          )}
+
+          {item.name ? (
+            <View style={styles.eventName}>
+              <Text style={styles.nameevent}>{item.name ? item.name : ""}</Text>
+            </View>
+          ) : (
+            <View />
+          )}
         </View>
       </View>
     );
   }
+
+  _signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate("Auth");
+  };
 
   render() {
     return (
@@ -186,14 +224,22 @@ export default class Home extends React.Component {
           <SvgUri
             width="80"
             height="80"
-            source={require("./src/svg/logo.svg")}
+            source={require("../resources/svg/logo.svg")}
           />
+          <Text style={{ color: "wihte" }}>Hola</Text>
+
           <View style={styles.claim}>
             <Text style={styles.text}>Bussines Meeting,</Text>
             <Text style={styles.text}>your contacts interesting</Text>
             <Text style={styles.text}>in your hand.</Text>
           </View>
+
           <View style={styles.slidesContainer}>
+            {this.state.loadingContent === true && (
+              <View>
+                <Text style={styles.text}>Buscando meetups cercanos..</Text>
+              </View>
+            )}
             {this.state.events !== null && (
               <Carousel
                 layout={"default"}
@@ -225,31 +271,62 @@ export default class Home extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "black"
+    height: "100%",
+    backgroundColor: "black",
+    color: "white"
   },
-  image: {
-    width: "100%"
+  slidesContainer: {
+    position: "absolute",
+    top: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "90%",
+    height: "380%"
   },
-  events: {
-    flex: 1,
-    height: 400,
-    marginTop: 100,
-    marginLeft: 0
+  logo: {
+    marginTop: 80,
+    marginLeft: 25
   },
-  eventsCard: {
-    marginRight: 20,
-    marginLeft: 20,
-    width: 200,
-    height: 400
+
+  claim: {
+    marginTop: 25
   },
   title: {
-    flex: 1,
-    marginTop: 0,
-    justifyContent: "center"
-  },
-  name: {
-    backgroundColor: "white",
+    fontFamily: "Helvetica",
+    fontWeight: "normal",
+    letterSpacing: 1.2,
+    fontSize: 13,
+    textAlign: "left",
+    marginBottom: 1.5,
     color: "black"
+  },
+  eventDate: {
+    flex: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "black"
+  },
+  eventName: {
+    backgroundColor: "white",
+    position: "absolute",
+    left: -10,
+    bottom: "15%",
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  nameevent: {
+    fontSize: 18
+  },
+  text: {
+    fontFamily: "Helvetica",
+    fontWeight: "normal",
+    letterSpacing: 1.2,
+    fontSize: 13,
+    textAlign: "left",
+    margin: 1.5,
+    color: "white"
+  },
+  slide: {
+    height: 400
   }
 });

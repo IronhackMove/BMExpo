@@ -35,7 +35,8 @@ const apiMeetups = {
    .then(response => {
      return response
      .map(categoryEvents => categoryEvents)
-   }) 
+   })
+   .catch(err => console.log("ha habido un error"))
   }
 };
 

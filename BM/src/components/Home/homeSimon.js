@@ -27,7 +27,7 @@ const ENTRIES1 = [
 		illustration: ''
 	},
 	{
-		event: 'Earlier this morning, NYC',
+	event: 'Earlier this morning, NYC',
     day1: 'Miercoles ·',
     day2: '00/00/0000',
     hour1: 'Hour',
@@ -98,7 +98,7 @@ export default class App extends Component {
             </View>
           </View>
       	
-				<Image style={{ width: wp(85), height: wp(140) }} source={{ uri: `${item.illustration}` }} />
+		<Image style={{ width: wp(85), height: wp(140) }} source={{ uri: `${item.illustration}` }} />
 
         <View>
           <Text style={styles.text}>{item.place}</Text>
@@ -117,7 +117,7 @@ export default class App extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={styles.logo}>
-					<SvgUri width="80" height="80" source={require('./src/svg/logo.svg')} />
+					<SvgUri width="80" height="80" source={require('../../svg/logo.svg')} />
 					<View style={styles.claim}>
 						<Text style={styles.text}>Bussines Meeting,</Text>
 						<Text style={styles.text}>your contacts interesting</Text>

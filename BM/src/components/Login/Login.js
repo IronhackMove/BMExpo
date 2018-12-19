@@ -33,7 +33,7 @@ export default class Login extends React.Component {
           linkText={
             <Image
               style={{ width: 210, height: 50 }}
-              source={require("../../images/linkedinlogin.png")}
+              source={require("../resources/images/linkedinlogin.png")}
             />
           }
           onSuccess={data => {
