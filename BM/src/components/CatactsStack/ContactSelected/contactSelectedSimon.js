@@ -7,16 +7,11 @@ import {
   TextInput,
   View,
   Image,
-  AsyncStorage,
-  TouchableHighlight,
-  KeyboardAvoidingView,
-  ScrollView
+  KeyboardAvoidingView
 } from "react-native";
 
 import SvgUri from "react-native-svg-uri";
 import ViewMoreText from "react-native-view-more-text";
-
-import apiBack from "../../api/apiBack";
 
 function wp(percentage) {
   const value = (percentage * viewportWidth) / 100;
@@ -30,10 +25,6 @@ const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
 const sliderWidth = wp(100);
 
 export default class ContactSelected extends Component {
-  static navigationOptions = {
-    header: null // !!! Hide Header
-  };
-
   constructor(props) {
     super(props);
     this.props = props;
@@ -58,6 +49,13 @@ export default class ContactSelected extends Component {
       this.state.contactId,
       this.state.note
     );
+  }
+
+  chatPage() {
+    this.props.navigation.navigate("ContactChat", {
+      emitter: this.state.userId,
+      receiver: this.state.contactId
+    });
   }
 
   loadAppInformation = async () => {
@@ -96,31 +94,24 @@ export default class ContactSelected extends Component {
     }
   };
 
-  chatPage = () => {
-    this.props.navigation.navigate("ContactChat", {
-      contactSelected: this.state.contactSelected,
-      emitter: this.state.userId,
-      receiver: this.state.contactId
-    });
-  };
-
   render() {
-    console.log(this.state.contactId);
+    console.log(sliderWidth);
 
     return (
-      <ScrollView>
-        {this.state.contactSelected !== null && (
-          <View style={styles.container}>
-            <View style={styles.imagePerfil}>
-              <Image
-                style={{ width: 250, height: 250, position: "absolute" }}
-                source={{
-                  uri: this.state.contactSelected.pictureUrls.values[0]
-                }}
-              />
-            </View>
-
-            <TouchableHighlight onPress={() => this.props.navigation.pop()}>
+      <KeyboardAvoidingView
+        style={styles.containerContact}
+        behavior="padding"
+        enabled
+      >
+        <View style={styles.container}>
+          {this.state.contactSelected !== null && (
+            <React.Fragment>
+              <View style={styles.imagePerfil}>
+                <Image
+                  style={{ width: 250, height: 250, position: "absolute" }}
+                  source={{uri: this.state.contactSelected.pictureUrl}}
+                />
+              </View>
               <View style={styles.arrow}>
                 <SvgUri
                   width="20"
@@ -128,163 +119,138 @@ export default class ContactSelected extends Component {
                   source={require("../../resources/svg/arrow.svg")}
                 />
               </View>
-            </TouchableHighlight>
+              <View style={styles.boxTitle}>
+                <View>
+                  <Text style={styles.textTitle}>
+                    {this.state.contactSelected.firstName}
+                  </Text>
+                </View>
+                <View style={styles.margin}>
+                  <Text style={styles.textTitle}>
+                    {this.state.contactSelected.lastName}
+                  </Text>
+                </View>
+              </View>
 
-            <View style={styles.boxTitle}>
-              <View>
-                <Text style={styles.textTitle}>
-                  {this.state.contactSelected.firstName}
+              <View style={styles.boxOption1}>
+                <Text style={styles.text}>Madrid, España</Text>
+              </View>
+              <View style={styles.boxOption2}>
+                <Text style={styles.text}>
+                  {this.state.contactSelected.headline}
                 </Text>
               </View>
-              <View style={styles.margin}>
-                <Text style={styles.textTitle}>
-                  {this.state.contactSelected.lastName}
-                </Text>
+              <View style={styles.acordeon}>
+                <ViewMoreText
+                  numberOfLines={4}
+                  renderViewMore={this.renderViewMore}
+                  renderViewLess={this.renderViewLess}
+                  textStyle={{ textAlign: "left" }}
+                >
+                  <Text style={styles.acordeon}>
+                    {this.state.contactSelected.summary}
+                  </Text>
+                </ViewMoreText>
               </View>
-            </View>
-
-            <View style={styles.boxOption1}>
-              <Text style={styles.text}>Madrid, España</Text>
-            </View>
-            <View style={styles.boxOption2}>
-              <Text style={styles.text}>
-                {this.state.contactSelected.headline}
-              </Text>
-            </View>
-
-            <View style={styles.acordeon}>
-              <ViewMoreText
-                numberOfLines={2}
-                renderViewMore={this.renderViewMore}
-                renderViewLess={this.renderViewLess}
-                textStyle={{ textAlign: "left", color: "white" }}
-              >
-                <Text style={styles.acordeon}>
-                  {this.state.contactSelected.summary}
-                </Text>
-              </ViewMoreText>
-            </View>
-
-            <View style={styles.add}>
-              <View>
-                <TouchableHighlight onPress={() => this.AddContact()}>
+              <View style={styles.add}>
+                <View>
                   <SvgUri
                     width="30"
                     height="30"
                     source={require("../../resources/svg//iconAdd.svg")}
                   />
-                </TouchableHighlight>
+                </View>
+                <View style={{ marginLeft: "5%", marginTop: "-1%" }}>
+                  <Text style={styles.text}>Add your notes</Text>
+                  <TextInput
+                    style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
+                    onChangeText={text =>
+                      this.setState({ ...this.state, note: text })
+                    }
+                    value={this.state.note}
+                  />
+                </View>
               </View>
-
               <View
-                style={{ marginLeft: "5%", marginTop: "-1%", width: "100%" }}
-              >
-                <Text style={styles.text}>Add your notes</Text>
-                <TextInput
-                  multiline={true}
-                  numberOfLines={4}
-                  style={{
-                    height: 40,
-                    borderWidth: 1,
-                    color: "white",
-                    width: "100%"
-                  }}
-                  onChangeText={text =>
-                    this.setState({ ...this.state, note: text })
-                  }
-                  value={this.state.note}
-                />
-              </View>
-            </View>
-            <View
-              style={{
-                borderBottomColor: "white",
-                borderBottomWidth: 2,
-                width: "90%",
-                marginLeft: "5%",
-                marginTop: "3%"
-              }}
-            />
-            <View
-              style={{
-                flexDirection: "row",
-                height: 80,
-                width: "100%",
-                marginTop: 40
-              }}
-            >
-              <TouchableHighlight
                 style={{
-                  borderColor: "white",
-                  borderWidth: 1,
-                  flex: 1,
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center"
+                  borderBottomColor: "white",
+                  borderBottomWidth: 2,
+                  width: "90%",
+                  marginLeft: "5%",
+                  marginTop: "3%"
+                }}
+              />
+              <View
+                style={{
+                  flexDirection: "row",
+                  height: "10%",
+                  width: "100%",
+                  marginTop: 40
                 }}
               >
-                <View>
+                <View
+                  style={{
+                    borderColor: "white",
+                    borderWidth: 1,
+                    flex: 1,
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
                   <SvgUri
                     width="30"
                     height="20"
-                    source={require("../../resources/svg/email.svg")}
+                    source={require("./src/svg/email.svg")}
                   />
                   <Text style={styles.button2}>eMail</Text>
                 </View>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{
-                  borderColor: "white",
-                  borderWidth: 1,
-                  flex: 1,
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <View>
+                <View
+                  style={{
+                    borderColor: "white",
+                    borderWidth: 1,
+                    flex: 1,
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
                   <SvgUri
                     width="20"
                     height="20"
-                    source={require("../../resources/svg/call.svg")}
+                    source={require("./src/svg/arrow.svg")}
                   />
                   <Text style={styles.button2}>Call</Text>
                 </View>
-              </TouchableHighlight>
-              <TouchableHighlight
-                onPress={this.chatPage}
-                style={{
-                  borderColor: "white",
-                  borderWidth: 1,
-                  flex: 1,
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <View>
+                <View
+                  style={{
+                    borderColor: "white",
+                    borderWidth: 1,
+                    flex: 1,
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
                   <SvgUri
                     width="40"
                     height="20"
-                    source={require("../../resources/svg/chat.svg")}
+                    source={require("./src/svg/chat.svg")}
                   />
                   <Text style={styles.button2}>Chat</Text>
                 </View>
-              </TouchableHighlight>
-            </View>
-          </View>
-        )}
-      </ScrollView>
+              </View>
+            </React.Fragment>
+          )}
+        </View>
+      </KeyboardAvoidingView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  containerContact: {
-    flex: 1
-  },
   container: {
-    height: "200%",
+    height: "100%",
     backgroundColor: "black",
     color: "white"
   },
@@ -292,11 +258,11 @@ const styles = StyleSheet.create({
     marginLeft: "43%"
   },
   arrow: {
-    marginTop: "15%",
+    marginTop: "23%",
     marginLeft: "6%"
   },
   boxTitle: {
-    marginTop: "12%",
+    marginTop: "7%",
     marginLeft: "4%"
   },
   margin: {
@@ -309,7 +275,6 @@ const styles = StyleSheet.create({
   },
   boxOption2: {
     marginTop: 30,
-    marginBottom: 20,
     marginLeft: "6%",
     marginRight: "6%"
   },
@@ -317,7 +282,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: 1.2,
     color: "white",
-    marginTop: 20,
+    marginTop: 40,
     marginLeft: "6%",
     marginRight: "6%"
   },

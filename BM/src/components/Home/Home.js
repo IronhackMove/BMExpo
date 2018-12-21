@@ -13,7 +13,6 @@ import {
   Dimensions
 } from "react-native";
 import { Text, Button } from "react-native-elements";
-import EventCard from "../Events/EventCard";
 import EventModal from "../Events/EventModal/EventModal";
 import { Days, meetupsIfError } from "../utils/utils";
 
@@ -46,17 +45,24 @@ export default class Home extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.loadPosition();
   }
 
-  setModalVisible(visible, event) {
+  setModalVisible = (visible, event) => {
     this.setState({
       ...this.state,
       modalVisible: visible,
       eventSelected: event
     });
-  }
+  };
+
+  closeModal = visible => {
+    this.setState({
+      ...this.state,
+      modalVisible: visible
+    });
+  };
 
   _showCategoriesMeetups() {
     apiMeetups.GetCategories();
@@ -84,7 +90,6 @@ export default class Home extends React.Component {
   };
 
   loadPosition = async () => {
-
     try {
       const token = await AsyncStorage.getItem("userToken");
       const position = await this.getCurrentPosition();
@@ -118,8 +123,10 @@ export default class Home extends React.Component {
         });
       });
 
+      const meets = await apiBack.SaveMeetups(token, joinMeetups);
+
       joinMeetups.unshift({});
-      console.log(joinMeetups);
+      console.log(JSON.stringify(joinMeetups));
 
       this.setState({
         ...this.state,
@@ -131,7 +138,10 @@ export default class Home extends React.Component {
       });
     } catch (error) {
       console.log("ha petado");
-      this.setState({loadingContent: false})
+      const token = await AsyncStorage.getItem("userToken");
+      const arrayOfMeetups = meetupsIfError;
+      const meets = await apiBack.SaveMeetups(token, arrayOfMeetups);
+      this.setState({ loadingContent: false, events: meetupsIfError });
       // console.log(error);
     }
   };
@@ -146,71 +156,75 @@ export default class Home extends React.Component {
 
   _keyExtractor = (item, index) => item.id;
 
-  // _renderItem = ({ item }) => (
-  //   <TouchableHighlight
-  //     onPress={() => {
-  //       this.setModalVisible(true, item);
-  //     }}
-  //   >
-  //     <EventCard item={item} city={this.state.events.city.city} />
-  //   </TouchableHighlight>
-  // );
-
-  _renderItem({ item, index }) {
-    console.log();
-
+  _renderItem = ({ item, index }) => {
     return (
-      <View style={styles.slide}>
-        <View>
-          <View>
-            {item.local_date ? (
-              <View style={styles.eventDate}>
-                <View style={styles.eventDay}>
-                  <Text style={styles.text}>
-                    {Days[moment(item.local_date).day()]}
-                  </Text>
-                  <Text style={styles.text}>
-                    {item.local_date ? item.local_date : ""}
-                  </Text>
+      <View>
+        {item.name ? (
+          <TouchableHighlight
+            onPress={() => {
+              if (item.name) {
+                this.setModalVisible(true, item);
+              }
+            }}
+          >
+            <View style={styles.slide}>
+              <View>
+                <View>
+                  {item.local_date ? (
+                    <View style={styles.eventDate}>
+                      <View style={styles.eventDay}>
+                        <Text style={styles.text}>
+                          {Days[moment(item.local_date).day()]}
+                        </Text>
+                        <Text style={styles.text}>
+                          {item.local_date ? item.local_date : ""}
+                        </Text>
+                      </View>
+                      <View style={styles.eventHour}>
+                        <Text style={styles.text}>Hour</Text>
+                        <Text style={styles.text}>
+                          {item.local_time ? item.local_time : ""}
+                        </Text>
+                      </View>
+                    </View>
+                  ) : (
+                    <View />
+                  )}
                 </View>
-                <View style={styles.eventHour}>
-                  <Text style={styles.text}>Hour</Text>
-                  <Text style={styles.text}>
-                    {item.local_time ? item.local_time : ""}
-                  </Text>
-                </View>
+
+                <Image
+                  style={{ width: wp(85), height: wp(120) }}
+                  source={item.image}
+                />
+
+                {item.venue ? (
+                  <View>
+                    <Text style={styles.text}>
+                      {item.venue ? item.venue.address_1 : "No adress"}
+                    </Text>
+                  </View>
+                ) : (
+                  <View />
+                )}
+
+                {item.name ? (
+                  <View style={styles.eventName}>
+                    <Text style={styles.nameevent}>
+                      {item.name ? item.name : ""}
+                    </Text>
+                  </View>
+                ) : (
+                  <View />
+                )}
               </View>
-            ) : (
-              <View />
-            )}
-          </View>
-
-          <Image
-            style={{ width: wp(85), height: wp(120) }}
-            source={item.image}
-          />
-
-          {item.venue ? (
-            <View>
-              <Text style={styles.text}>
-                {item.venue ? item.venue.address_1 : "No adress"}
-              </Text>
             </View>
-          ) : (
-            <View />
-          )}
-
-          {item.name ? (
-            <View style={styles.eventName}>
-              <Text style={styles.nameevent}>{item.name ? item.name : ""}</Text>
-            </View>
-          ) : (
-            <View />
-          )}
-        </View>
+          </TouchableHighlight>
+        ) : (
+          <View />
+        )}
       </View>
     );
-  }
+  };
 
   _signOutAsync = async () => {
     await AsyncStorage.clear();
@@ -235,9 +249,22 @@ export default class Home extends React.Component {
           </View>
 
           <View style={styles.slidesContainer}>
+        
             {this.state.loadingContent === true && (
               <View>
+                <Button title="Salir" onPress={this._signOutAsync} />
                 <Text style={styles.text}>Buscando meetups cercanos..</Text>
+              </View>
+            )}
+        
+            <EventModal
+              eventSelected={this.state.eventSelected}
+              closeModal={this.closeModal}
+              visible={this.state.modalVisible}
+            />
+              {this.state.loadingContent === false && (
+              <View style={{position:"absolute", left: 150}}>
+                <Image source={require("../resources/images/animationHand.gif")} />
               </View>
             )}
             {this.state.events !== null && (

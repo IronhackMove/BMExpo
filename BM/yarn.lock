@@ -4648,7 +4648,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2:
+prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   integrity sha512-3pboPvLiWD7dkI3qf3KbUe6hKFKa52w+AE0VCqECtf+QHAKgOL37tTaNCnuX1nAAQ4ZhyP+kYVKf8rLmJ/feDQ==
@@ -4778,6 +4778,13 @@ react-native-branch@2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/react-native-branch/-/react-native-branch-2.2.5.tgz#4074dd63b4973e6397d9ce50e97b57c77a518e9d"
   integrity sha1-QHTdY7SXPmOX2c5Q6XtXx3pRjp0=
+
+react-native-button@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-button/-/react-native-button-2.3.0.tgz#7d0a90095d415b0edf98a904556a7c4439646568"
+  integrity sha512-NZet4juC9+yNN/ql4WYfrjRp/cyuN9zwYwMb/0yllwGCzxfAVqMU59oNCaMQvkMkgV/S52RcwER1QWZH7k1AQg==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-camera@^1.5.1:
   version "1.6.3"
@@ -4924,6 +4931,11 @@ react-native-screens@1.0.0-alpha.15:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-1.0.0-alpha.17.tgz#8c1a7224b967c476670963fce7d06b946e7158e9"
   integrity sha512-BvLtqbMpteXsY3XofCCX0c2LM6X14PhjN5FZraROEXuEnw8n8ImDTuXxUPDYZqq2Wjb1bLlm1zE5+c6dcGlY+Q==
 
+react-native-select-input-ios@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-select-input-ios/-/react-native-select-input-ios-2.0.1.tgz#56019c8a279fcdf4d09f408ee2c49f74908009e9"
+  integrity sha512-ueS0W855YAMs1EMaRhiqKU6L1+Sqx45/JidYle4l0fQ6Jj1/AX6LXqIRm9WLODjSdVt4D/mwDSv5vVCI8oJJNg==
+
 react-native-snap-carousel@^3.7.5:
   version "3.7.5"
   resolved "https://registry.yarnpkg.com/react-native-snap-carousel/-/react-native-snap-carousel-3.7.5.tgz#7172456d40ab9161523055eb302f9b03b244240a"
@@ -4979,6 +4991,13 @@ react-native-vector-icons@^6.1.0:
     lodash "^4.0.0"
     prop-types "^15.6.2"
     yargs "^8.0.2"
+
+react-native-view-more-text@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-view-more-text/-/react-native-view-more-text-2.0.1.tgz#2b609962048e471c028bdc2e6555680ea62f7a12"
+  integrity sha512-MzFb5+RpCdhm8esf5O6Csw/KrBg6eKqACzv8czYLlewwKE2TvRB9sfb+PhK2K6pyWqJ8jh3KneTjFn3Kndr79Q==
+  dependencies:
+    prop-types "^15.5.7"
 
 react-native-view-shot@2.5.0:
   version "2.5.0"

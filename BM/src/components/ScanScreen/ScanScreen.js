@@ -4,7 +4,6 @@ import apiBack from "../api/apiBack";
 import { Avatar, Badge, Text } from "react-native-elements";
 import { BarCodeScanner, Permissions } from "expo";
 
-
 import {
   StyleSheet,
   TouchableOpacity,
@@ -15,6 +14,8 @@ import {
   StatusBar,
   Vibration
 } from "react-native";
+
+import ModalNewContact from "./ModalNewContact";
 
 // import QRCodeScanner from "react-native-qrcode-scanner";
 
@@ -28,7 +29,8 @@ export default class ScanScreen extends Component {
       idUser: null,
       qrStatus: true,
       contactUser: null,
-      hasCameraPermission: null
+      hasCameraPermission: null,
+      cameraReady: true
     };
   }
 
@@ -44,7 +46,7 @@ export default class ScanScreen extends Component {
     if (!this.state.lastScannedUrl) {
       return;
     }
-  }
+  };
 
   // _requestCameraPermission = async () => {
   //   const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -61,17 +63,30 @@ export default class ScanScreen extends Component {
     }
   };
 
+  _closeModal = () => {
+    this.setState({ ...this.state, isModalVisible: false });
+  };
+
   loadDataApp = async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
       const userProfile = await apiBack.GetUserProfile(token);
       const permission = await Permissions.askAsync(Permissions.CAMERA);
+      const meetups = await apiBack.GetUserMeetups(token);
+      const selectMeetups = [];
 
-      console.log(permission);
+      newMeetups = meetups.data;
+      formatedMeetups = newMeetups.map(meet => meet.name);
+      formatedMeetups.forEach((meet, i) => {
+        selectMeetups.push({ value: i, label: meet });
+      });
+
+      console.log(selectMeetups);
 
       this.setState({
         ...this.state,
         token: token,
+        meetups: selectMeetups,
         idUser: userProfile.data.id,
         hasCameraPermission: permission.status
       });
@@ -83,11 +98,11 @@ export default class ScanScreen extends Component {
   onSuccess(e) {
     console.log(e);
     apiBack.GetContactInfo(e.data).then(contact => {
-      Vibration.vibrate(500)
+      Vibration.vibrate(500);
       console.log(contact.data);
       this.setState({
         ...this.state,
-        contactUser: contact,
+        contactUser: contact.data,
         qrStatus: false,
         isModalVisible: true
       });
@@ -102,55 +117,24 @@ export default class ScanScreen extends Component {
     </TouchableOpacity>
   );
 
-  renderModalContent = () => (
-    <View style={styles.modalContent}>
-      {this.state.contactUser !== null && (
-        <View>
-          <Badge containerStyle={{ backgroundColor: "#2689DC" }}>
-            <Text h2 style={{ color: "white" }}>
-              {this.state.contactUser.data.firstName}
-            </Text>
-          </Badge>
-
-          <Avatar
-            xlarge
-            rounded
-            source={{
-              uri: `${this.state.contactUser.data.pictureUrl}`
-            }}
-            onPress={() => console.log("Works!")}
-            activeOpacity={0.7}
-            avatarStyle={{
-              shadowColor: "black",
-              shadowRadius: 10
-            }}
-          />
-          <Badge containerStyle={{ backgroundColor: "#2689DC" }}>
-            <Text style={{ color: "white" , fontSize: 15, }}>
-              {this.state.contactUser.data.headline}
-            </Text>
-          </Badge>
-        </View>
-      )}
-
-      {this.renderButton("Close", () => {
-        this.props.navigation.navigate("Home");
-        this.setState({ isModalVisible: false, qrStatus: true });
-      })}
-      {this.renderButton("Guardar", () => {
-        apiBack
-          .SaveUserContact(this.state.idUser, this.state.contactUser.data.id)
-          .then(() => {
-            this.props.navigation.navigate("Home");
-          });
-      })}
-    </View>
-  );
-
   render() {
     console.log(this.state.token);
     return (
       <React.Fragment>
+        {this.state.contactUser !== null && (
+          <View style={styles.modal}>
+            <Modal isVisible={this.state.isModalVisible}>
+              <ModalNewContact
+                userId={this.state.idUser}
+                contactUserId={this.state.contactUser.id}
+                meetups={this.state.meetups}
+                closeModal={this._closeModal}
+                contact={this.state.contactUser}
+              />
+            </Modal>
+          </View>
+        )}
+
         <View style={styles.container}>
           {this.state.hasCameraPermission === null ? (
             <Text>Requesting for camera permission</Text>
@@ -159,42 +143,35 @@ export default class ScanScreen extends Component {
               Camera permission is not granted
             </Text>
           ) : (
-            <BarCodeScanner
-              onBarCodeRead={this.onSuccess.bind(this)}
-              style={{
-                height: Dimensions.get("window").height,
-                width: Dimensions.get("window").width
-              }}
-            />
+            <View>
+              {this.state.cameraReady !== false && (
+                <BarCodeScanner
+                  onBarCodeRead={this.onSuccess.bind(this)}
+                  style={{
+                    height: Dimensions.get("window").height,
+                    width: Dimensions.get("window").width
+                  }}
+                />
+              )}
+            </View>
           )}
 
           {this._maybeRenderUrl()}
 
           <StatusBar hidden />
         </View>
-        {/* <QRCodeScanner
-          reactivate={true}
-          reactivateTimeout={3000}
-          onRead={this.onSuccess.bind(this)}
-          topContent={<Text style={styles.centerText}>BM</Text>}
-          bottomContent={
-            <TouchableOpacity style={styles.buttonTouchable}>
-              {this.renderButton("Close", () => {
-                this.props.navigation.navigate("Home");
-                this.setState({ isModalVisible: false, qrStatus: true });
-              })}
-            </TouchableOpacity>
-          }
-        /> */}
-        <Modal isVisible={this.state.isModalVisible}>
-          {this.renderModalContent()}
-        </Modal>
       </React.Fragment>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  modal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 500
+  },
   centerText: {
     flex: 1,
     fontSize: 18,

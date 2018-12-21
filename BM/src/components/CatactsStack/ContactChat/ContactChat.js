@@ -17,16 +17,25 @@ import io from "socket.io-client";
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
 
-import { GiftedChat } from "react-native-gifted-chat";
+import {
+  GiftedChat,
+  Actions,
+  Bubble,
+  SystemMessage
+} from "react-native-gifted-chat";
 import apiBack from "../../api/apiBack";
 
 export default class ContactChat extends Component {
+  
+
+
   constructor(props) {
     super(props);
-
+    this.props=props
     this.socket = io(URL);
 
     this.state = {
+      contactSelected: this.props.navigation.state.params.contactSelected,
       commonIdChat: null,
       emitter: this.props.navigation.state.params.emitter,
       receiver: this.props.navigation.state.params.receiver,
@@ -43,6 +52,8 @@ export default class ContactChat extends Component {
     };
 
     this.onSend = this.onSend.bind(this);
+    this.renderSystemMessage = this.renderSystemMessage.bind(this);
+    this.renderBubble = this.renderBubble.bind(this);
 
     this.socket.on("receiver", message => {
       var data = [
@@ -67,6 +78,40 @@ export default class ContactChat extends Component {
 
   componentWillMount() {
     this._getCommonChat();
+  }
+
+  renderSystemMessage(props) {
+    return (
+      <SystemMessage
+        {...props}
+        containerStyle={{
+          marginBottom: 15,
+          backgroundColor: "black"
+        }}
+        textStyle={{
+          fontSize: 14
+        }}
+      />
+    );
+  }
+
+  renderBubble(props) {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          left: {
+            backgroundColor: "white",
+            borderColor: "ffffff",
+            borderWidth: 1
+          },
+          right: {
+            backgroundColor: "rgb(106,17,203)",
+            color: "white"
+          }
+        }}
+      />
+    );
   }
 
   _getCommonChat = async () => {
@@ -102,17 +147,21 @@ export default class ContactChat extends Component {
   }
 
   render() {
-    console.log(this.state.emitter);
-    console.log(this.state.receiver);
+    console.log(this.state.contactSelected);
 
     return (
-      <GiftedChat
-        messages={this.state.messages}
-        onSend={messages => this.onSend(messages)}
-        user={{
-          _id: this.state.emitter
-        }}
-      />
+
+        <GiftedChat
+          styles={{backgroundColor: "black"}}
+          messages={this.state.messages}
+          onSend={messages => this.onSend(messages)}
+          renderSystemMessage={this.renderSystemMessage}
+          renderBubble={this.renderBubble}
+          user={{
+            _id: this.state.emitter
+          }}
+        />
+
     );
   }
 

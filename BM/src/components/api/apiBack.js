@@ -37,6 +37,16 @@ const apiBack = {
     return response;
   },
 
+  async GetUserMeetups(token) {
+    const response = await axios.get(`${URL}/auth/getUserMeetups/${token}`)
+    return response;
+  },
+
+  async SaveMeetups(token, meetups) {
+    const response = await axios.post(`${URL}/auth/saveMeetups/${token}`, {meetups: meetups})
+    return response;
+  },
+
   async GetContactInfo(linkedIn) {
     const response = await axios.post(`${URL}/auth/getUserProfile/${linkedIn}`)
     return response;
@@ -72,11 +82,11 @@ const apiBack = {
   },
 
 
-  SaveUserContact: (userId, contactId) => {
+  SaveUserContact: (userId, contactId, meetup) => {
     var ids = [userId, contactId];
     console.log(ids);
     return axios
-      .post(`${URL}/auth/saveContact/`, { ids: ids })
+      .post(`${URL}/auth/saveContact/`, { ids: ids, meetup: meetup })
       .then(response => response.data);
   },
 

@@ -23,6 +23,7 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.almon.bm",
       "supportsTablet": true
     }
   }
