@@ -23,9 +23,60 @@ function wp(percentage) {
   return Math.round(value);
 }
 
+const iron = {
+  created: 1544383542000,
+  duration: 10800000,
+  id: "257084100",
+  name: "Ironhack, pon un programador en tu vida",
+  rsvp_limit: 100,
+  status: "upcoming",
+  time: 1545321600000,
+  local_date: "2018-12-21",
+  local_time: "15:30 - 18:30",
+  updated: 1544466020000,
+  utc_offset: 3600000,
+  waitlist_count: 0,
+  yes_rsvp_count: 95,
+  venue: {
+    id: 25615553,
+    name: "GoMadrid",
+    lat: 40.420101165771484,
+    lon: -3.705322027206421,
+    repinned: true,
+    address_1: "Paseo de la Chopera, 14",
+    address_2: "Planta 2",
+    city: "Madrid",
+    country: "es",
+    localized_country_name: "España"
+  },
+  group: {
+    created: 1495125612000,
+    name: "Cryptoinvest (Inversión en criptomonedas)",
+    id: 23847260,
+    join_mode: "open",
+    lat: 40.41999816894531,
+    lon: -3.7100000381469727,
+    urlname: "Cryptoinvest",
+    who: "Criptoinversores",
+    localized_location: "Madrid, España",
+    state: "",
+    country: "es",
+    region: "es",
+    timezone: "Europe/Madrid"
+  },
+  link: "https://www.meetup.com/es/Cryptoinvest/events/257084100/",
+  description:
+    `Disfruta este Viernes 20 de diciembre de la presentación del Bootcamp de Web.
+
+    Una convivencia de 9 semanas aplicando diferentes lenguajes de programación dan como resultado aplicaciones visuales de gran calibre, listas para la implantación en empresas.`,
+  visibility: "public",
+  image: require("../resources/images/Tec/Tec1.jpg")
+}
+
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
 );
+
 const slideHeight = wp(30);
 const sliderWidth = wp(100);
 const itemWidth = wp(85);
@@ -102,7 +153,7 @@ export default class Home extends React.Component {
 
       const meetups = closeMeetups
         .map(meetups => meetups.data)
-        .map(events => events.events.slice(0, 5));
+        .map(events => events.events.slice(0, 2));
 
       categories.forEach((category, i) => {
         meetups[i].forEach(meet => {
@@ -125,8 +176,8 @@ export default class Home extends React.Component {
 
       const meets = await apiBack.SaveMeetups(token, joinMeetups);
 
+      joinMeetups.unshift(iron);
       joinMeetups.unshift({});
-      console.log(JSON.stringify(joinMeetups));
 
       this.setState({
         ...this.state,

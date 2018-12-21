@@ -67,9 +67,6 @@ const AppStack = createBottomTabNavigator({
           color: "white",
           alignItems: "center",
           backgroundColor: 'black', // TabBar background
-          shadowOffset: { width: 0, height: 10 },
-          shadowColor: "white",
-          shadowRadius: 4,
       }
   }
 });

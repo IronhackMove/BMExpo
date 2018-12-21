@@ -10,7 +10,7 @@ import {
   ScrollView,
   AsyncStorage,
   TouchableHighlight,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
 } from "react-native";
 
 import SvgUri from "react-native-svg-uri";
@@ -28,10 +28,9 @@ const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
 const sliderWidth = wp(100);
 
 export default class App extends Component {
-
   static navigationOptions = {
     header: null // !!! Hide Header
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -43,6 +42,11 @@ export default class App extends Component {
       phoneNumber: ""
     };
   }
+
+  _signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate("Auth");
+  };
 
   componentDidMount() {
     AsyncStorage.getItem("userToken").then(token => {
@@ -84,14 +88,16 @@ export default class App extends Component {
                   }}
                 />
               </View>
-              <TouchableHighlight onPress={() => this.props.navigation.navigate("Home")}>
-              <View style={styles.arrow}>
-                <SvgUri
-                  width="20"
-                  height="20"
-                  source={require("../resources/svg/arrow.svg")}
-                />
-              </View>
+              <TouchableHighlight
+                onPress={() => this.props.navigation.navigate("Home")}
+              >
+                <View style={styles.arrow}>
+                  <SvgUri
+                    width="20"
+                    height="20"
+                    source={require("../resources/svg/arrow.svg")}
+                  />
+                </View>
               </TouchableHighlight>
               <View style={styles.boxTitle}>
                 <View>
@@ -163,7 +169,7 @@ export default class App extends Component {
                   </View>
                 </TouchableHighlight>
                 <TouchableHighlight onPress={this._updateProfile}>
-                  <View style={{ marginLeft: "5%", marginTop: "-1%" }}>
+                  <View style={{ marginLeft: "15%", marginTop: "-1%" }}>
                     <Text style={styles.text}>PHONE</Text>
                     <TextInput
                       style={{
@@ -216,12 +222,9 @@ export default class App extends Component {
                   marginLeft: "19%"
                 }}
               >
-                <Text style={styles.category}>Bussines</Text>
-                <Text style={styles.category}>Community</Text>
-                <Text style={styles.category}>Education</Text>
-                <Text style={styles.category}>Politics</Text>
-                <Text style={styles.category}>Support</Text>
-                <Text style={styles.category}>Tec</Text>
+                {this.state.userProfile.selectedCategories.map(category => (
+                  <Text style={styles.category}>{category.shortname}</Text>
+                ))}
               </View>
               <View
                 style={{
@@ -233,6 +236,9 @@ export default class App extends Component {
                   marginBottom: 50
                 }}
               />
+              <TouchableHighlight onPress={this._signOutAsync}>
+                <Text style={{color: "white", textDecorationLine: "underline", marginBottom: 20}}>Logout</Text>
+              </TouchableHighlight>
             </React.Fragment>
           )}
         </ScrollView>

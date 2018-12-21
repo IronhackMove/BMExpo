@@ -53,18 +53,6 @@ export default class Contacts extends Component {
       activeSections: [],
       user: null
     };
-
-    this.socket = io(URL);
-
-    this.socket.on("updateContacts", message => {
-      AsyncStorage.getItem("userToken")
-        .then(token => apiBack.GetContactOfUsers(token))
-        .then(user => {
-          console.log(user);
-          // this.socket.on("updateContacts", contacts => {});
-          this.setState({ ...this.state, user: user });
-        });
-    });
   }
 
   _renderHeader = item => {
