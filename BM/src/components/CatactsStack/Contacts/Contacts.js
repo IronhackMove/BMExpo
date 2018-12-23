@@ -34,25 +34,36 @@ export default class Contacts extends Component {
 
   _updateList = () => {
     
-    setInterval(() => {
+    // setInterval(() => {
 
-      AsyncStorage.getItem("userToken")
-      .then(token => apiBack.GetContactOfUsers(token))
-      .then(user => {
-        console.log(user);
-        // this.socket.on("updateContacts", contacts => {});
-        this.setState({ ...this.state, user: user });
-      });
+    //   AsyncStorage.getItem("userToken")
+    //   .then(token => apiBack.GetContactOfUsers(token))
+    //   .then(user => {
+    //     console.log(user);
+    //     // this.socket.on("updateContacts", contacts => {});
+    //     this.setState({ ...this.state, user: user });
+    //   });
 
-    }, 2000)
+    // }, 2000)
   }
 
   constructor() {
     super();
     this.state = {
       activeSections: [],
-      user: null
+      user: null,
+      contacts: []
     };
+
+    this.contacts= []
+    this.socket = io(URL);
+
+    this.socket.on('updateContactList', (newContactList) => {
+
+      this.setState({...this.state, contacts: newContactList })
+    
+    });
+
   }
 
   _renderHeader = item => {
@@ -122,7 +133,7 @@ export default class Contacts extends Component {
 
         {this.state.user !== null && (
           <Accordion
-            sections={this.state.user.contacts}
+            sections={this.state.contacts}
             activeSections={this.state.activeSections}
             renderSectionTitle={this._renderSectionTitle}
             renderHeader={this._renderHeader}
