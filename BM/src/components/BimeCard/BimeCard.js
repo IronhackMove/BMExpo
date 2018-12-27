@@ -16,7 +16,6 @@ export default class BimeCard extends Component {
   }
 
   componentDidMount() {
-    console.log(BMCards);
     this.loadDataApp();
   }
 
@@ -24,8 +23,6 @@ export default class BimeCard extends Component {
     try {
       const token = await AsyncStorage.getItem("userToken");
       const userProfile = await apiBack.GetUserProfile(token);
-
-      console.log(userProfile);
 
       this.setState({
         ...this.state,

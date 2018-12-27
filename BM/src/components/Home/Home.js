@@ -16,6 +16,9 @@ import { Text, Button } from "react-native-elements";
 import EventModal from "../Events/EventModal/EventModal";
 import { Days, meetupsIfError } from "../utils/utils";
 
+import io from "socket.io-client";
+import { URL } from "../utils/utils";
+
 var moment = require("moment");
 
 function wp(percentage) {
@@ -65,13 +68,12 @@ const iron = {
     timezone: "Europe/Madrid"
   },
   link: "https://www.meetup.com/es/Cryptoinvest/events/257084100/",
-  description:
-    `Disfruta este Viernes 20 de diciembre de la presentación del Bootcamp de Web.
+  description: `Disfruta este Viernes 20 de diciembre de la presentación del Bootcamp de Web.
 
     Una convivencia de 9 semanas aplicando diferentes lenguajes de programación dan como resultado aplicaciones visuales de gran calibre, listas para la implantación en empresas.`,
   visibility: "public",
   image: require("../resources/images/Tec/Tec1.jpg")
-}
+};
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
@@ -119,27 +121,6 @@ export default class Home extends React.Component {
     apiMeetups.GetCategories();
   }
 
-  _reloadApi = async () => {
-    console.log("hola");
-    const token = await AsyncStorage.getItem("userToken");
-    const categories = this.state.user.selectedCategories;
-    const closeMeetups = await apiMeetups.GetCloseMeetups(
-      token,
-      this.state.location
-    );
-    const meetups = closeMeetups
-      .map(meetups => meetups.data)
-      .map(events => events.events.slice(0, 5));
-    const meetupsCategorized = [];
-
-    categories.forEach((category, i) => {
-      meetups[i].push({ category: category });
-    });
-
-    console.log(meetups);
-    this.setState({ ...this.state, buttonRefresh: false, events: meetups });
-  };
-
   loadPosition = async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
@@ -174,7 +155,7 @@ export default class Home extends React.Component {
         });
       });
 
-      const meets = await apiBack.SaveMeetups(token, joinMeetups);
+      const meets = await apiBack.SaveMeetups(token, meetupsIfError);
 
       joinMeetups.unshift(iron);
       joinMeetups.unshift({});
@@ -184,16 +165,14 @@ export default class Home extends React.Component {
         token: token,
         location: position.coords,
         user: userProfile.data,
-        events: joinMeetups,
+        events: meetupsIfError,
         loadingContent: false
       });
     } catch (error) {
-      console.log("ha petado");
       const token = await AsyncStorage.getItem("userToken");
       const arrayOfMeetups = meetupsIfError;
       const meets = await apiBack.SaveMeetups(token, arrayOfMeetups);
       this.setState({ loadingContent: false, events: meetupsIfError });
-      // console.log(error);
     }
   };
 
@@ -300,22 +279,23 @@ export default class Home extends React.Component {
           </View>
 
           <View style={styles.slidesContainer}>
-        
             {this.state.loadingContent === true && (
               <View>
                 <Button title="Salir" onPress={this._signOutAsync} />
                 <Text style={styles.text}>Buscando meetups cercanos..</Text>
               </View>
             )}
-        
+
             <EventModal
               eventSelected={this.state.eventSelected}
               closeModal={this.closeModal}
               visible={this.state.modalVisible}
             />
-              {this.state.loadingContent === false && (
-              <View style={{position:"absolute", left: 150}}>
-                <Image source={require("../resources/images/animationHand.gif")} />
+            {this.state.loadingContent === false && (
+              <View style={{ position: "absolute", left: 150 }}>
+                <Image
+                  source={require("../resources/images/animationHand.gif")}
+                />
               </View>
             )}
             {this.state.events !== null && (
@@ -336,10 +316,6 @@ export default class Home extends React.Component {
       </View>
     );
   }
-
-  _showMoreApp = () => {
-    this.props.navigation.navigate("Other");
-  };
 
   _signOutAsync = async () => {
     await AsyncStorage.clear();

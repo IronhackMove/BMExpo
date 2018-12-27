@@ -32,7 +32,7 @@ export default class Categories extends Component {
     super(props);
     this.props = props;
     this.state = {
-      token: this.props.navigation.getParam("access_token"),
+      token: null,
       lenguage: null,
       categories: null,
       selectedCategories: []
@@ -40,13 +40,16 @@ export default class Categories extends Component {
   }
 
   componentDidMount() {
-    apiBack
-      .GetCategories()
-      .then(response => this.setState({ ...this.state, categories: response }));
+    this._loadInitialInfo()
   }
 
+  _loadInitialInfo = async () => {
+    const token = await AsyncStorage.getItem("userToken");
+    const categories = await apiBack.GetCategories()
+    this.setState({...this.state, token: token, categories: categories.data})
+  } 
+
   _handleButton(category) {
-    console.log(category);
     var arraySelectedCategories = this.state.selectedCategories;
     let foundCategory = {
       found: false,
@@ -103,7 +106,6 @@ export default class Categories extends Component {
                   borderRadius: 3,
                   marginLeft: 10
                 }}
-                onPress={() => console.log("hola")}
               >
                 <Text style={{ color: "black", fontSize: 21 }}>
                   {selectedCategory.shortname}

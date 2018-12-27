@@ -10,7 +10,7 @@ import {
   ScrollView,
   AsyncStorage,
   TouchableHighlight,
-  KeyboardAvoidingView,
+  KeyboardAvoidingView
 } from "react-native";
 
 import SvgUri from "react-native-svg-uri";
@@ -197,13 +197,16 @@ export default class App extends Component {
                 }}
               />
               <View style={styles.add}>
-                <View>
-                  <SvgUri
-                    width="30"
-                    height="30"
-                    source={require("../resources/svg/iconAdd.svg")}
-                  />
-                </View>
+                <TouchableHighlight onPress={()=>this.props.navigation.navigate("Categories")}>
+                  <View>
+                    <SvgUri
+                      width="30"
+                      height="30"
+                      source={require("../resources/svg/iconAdd.svg")}
+                    />
+                  </View>
+                </TouchableHighlight>
+
                 <View style={{ marginLeft: "5%", marginTop: "-1%" }}>
                   <View>
                     <Text style={styles.text}>CATEGORY</Text>
@@ -237,7 +240,15 @@ export default class App extends Component {
                 }}
               />
               <TouchableHighlight onPress={this._signOutAsync}>
-                <Text style={{color: "white", textDecorationLine: "underline", marginBottom: 20}}>Logout</Text>
+                <Text
+                  style={{
+                    color: "white",
+                    textDecorationLine: "underline",
+                    marginBottom: 20
+                  }}
+                >
+                  Logout
+                </Text>
               </TouchableHighlight>
             </React.Fragment>
           )}

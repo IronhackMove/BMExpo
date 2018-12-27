@@ -55,6 +55,7 @@ const AppStack = createBottomTabNavigator({
     }
   }
 },{
+  lazy: false,
   tabBarOptions: {
       showLabel: false,
       labelStyle: {

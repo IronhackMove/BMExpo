@@ -18,20 +18,10 @@ const apiBack = {
       });
   },
 
-  GetCategories: () => {
-    return axios
-      .get(`${URL}/auth/getCategories/`)
-      .then(response => response.data);
+  async GetCategories() {
+    return await axios.get(`${URL}/auth/getCategories/`)
   },
-
-  SayHello: () => {
-    console.log("hola");
-    return axios
-      .get(`${URL}/auth/sayHello/`)
-      .then(response => console.log(response))
-      .catch(err => console.log(err));
-  },
-
+  
  async GetUserProfile(token) {
     const response = await axios.get(`${URL}/auth/getUserProfile/${token}`)
     return response;

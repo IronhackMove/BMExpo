@@ -46,7 +46,6 @@ export default class App extends Component {
     };
   }
   render() {
-    console.log(sliderWidth);
 
     return (
       <Modal
@@ -67,7 +66,6 @@ export default class App extends Component {
             </View>
             <TouchableHighlight
               onPress={() => {
-                console.log("hola");
                 this.props.closeModal(false);
               }}
             >

@@ -81,8 +81,6 @@ export default class ScanScreen extends Component {
         selectMeetups.push({ value: i, label: meet });
       });
 
-      console.log(selectMeetups);
-
       this.setState({
         ...this.state,
         token: token,
@@ -96,10 +94,8 @@ export default class ScanScreen extends Component {
   };
 
   onSuccess(e) {
-    console.log(e);
     apiBack.GetContactInfo(e.data).then(contact => {
       Vibration.vibrate(500);
-      console.log(contact.data);
       this.setState({
         ...this.state,
         contactUser: contact.data,
@@ -118,7 +114,6 @@ export default class ScanScreen extends Component {
   );
 
   render() {
-    console.log(this.state.token);
     return (
       <React.Fragment>
         {this.state.contactUser !== null && (

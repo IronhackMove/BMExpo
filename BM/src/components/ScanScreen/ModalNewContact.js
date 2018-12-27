@@ -43,22 +43,12 @@ export default class ModalNewContact extends Component {
     objContact = {
       userId: this.props.userId,
       contactUserId: this.props.contactUserId,
-      // contactUserId: "jHLAQBmW5n",
       meetups: this.props.meetups[this.state.valueSmall0].label
-      // meetups: "Ironhack"
     }
 
     this.socket.emit("updateContact", objContact);
+    this.props.closeModal();
 
-    this.props.closeModal()
-
-
-    // console.log(this.props.userId, this.props.contactUserId)
-    // apiBack
-    // .SaveUserContact(this.props.userId, this.props.contactUserId, this.props.meetups[this.state.valueSmall0].label)
-    // .then(() => 
-    //   this.props.closeModal()
-    // );
   }
 
   render() {
@@ -69,24 +59,24 @@ export default class ModalNewContact extends Component {
           <View>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <View style={{ width: "40%", height: "120%" }}>
-                {/* <Image
+                <Image
                   style={styles.avatar}
                   source={{ uri: this.props.contact.pictureUrls.values[0] }}
-                /> */}
+                />
               </View>
               <View style={{ width: "60%", marginTop: "5%" }}>
-                {/* <View>
+                <View>
                   <Text style={styles.textName}>
                     {this.props.contact.firstName}
                   </Text>
                   <Text style={styles.textSubname}>
                     {this.props.contact.lastName}
                   </Text>
-                </View> */}
+                </View>
 
-                {/* <View style={{ position: "absolute", marginTop: "35%" }}>
+                <View style={{ position: "absolute", marginTop: "35%" }}>
                   <Text style={styles.text}>{this.props.contact.headline}</Text>
-                </View> */}
+                </View>
               </View>
             </View>
             <View style={styles.push}>

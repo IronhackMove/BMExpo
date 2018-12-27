@@ -4,7 +4,6 @@ import React, { Component } from "react";
 import io from "socket.io-client";
 import { URL } from "../../utils/utils";
 
-
 import {
   StyleSheet,
   Text,
@@ -18,52 +17,52 @@ import apiBack from "../../api/apiBack";
 import Accordion from "react-native-collapsible/Accordion";
 import SvgUri from "react-native-svg-uri";
 
+const _ = require("lodash");
+
 export default class Contacts extends Component {
-
-
-
   static navigationOptions = {
     header: null // !!! Hide Header
   };
 
   componentDidMount() {
-     
     this._updateList();
-
   }
 
   _updateList = () => {
-    
-    // setInterval(() => {
-
-    //   AsyncStorage.getItem("userToken")
-    //   .then(token => apiBack.GetContactOfUsers(token))
-    //   .then(user => {
-    //     console.log(user);
-    //     // this.socket.on("updateContacts", contacts => {});
-    //     this.setState({ ...this.state, user: user });
-    //   });
-
-    // }, 2000)
-  }
+    AsyncStorage.getItem("userToken")
+      .then(token => apiBack.GetContactOfUsers(token))
+      .then(user => {
+        this.setState({ ...this.state, user: user, contacts: user.contacts });
+      });
+  };
 
   constructor() {
     super();
     this.state = {
+      token: null,
       activeSections: [],
       user: null,
       contacts: []
     };
 
-    this.contacts= []
+    this.contacts = [];
+
     this.socket = io(URL);
 
-    this.socket.on('updateContactList', (newContactList) => {
-
-      this.setState({...this.state, contacts: newContactList })
-    
+    this.socket.on("updateContactList", newContactData => {
+      console.log(newContactData);
+      if (_.includes(newContactData, this.state.user.id)) {
+        AsyncStorage.getItem("userToken")
+          .then(token => {
+            console.log(token)
+            apiBack.GetContactOfUsers(token)
+            .then(user => {
+              apiBack.GetContactOfUsers(user.access_token)
+              .then(userUpdated => this.setState({...this.state, contacts: userUpdated.contacts}))
+            })
+          })
+      }
     });
-
   }
 
   _renderHeader = item => {
@@ -88,7 +87,6 @@ export default class Contacts extends Component {
     );
   };
   _renderContent = item => {
-    console.log(item);
     return (
       <TouchableHighlight
         onPress={() =>
@@ -131,7 +129,7 @@ export default class Contacts extends Component {
           </View>
         </TouchableHighlight>
 
-        {this.state.user !== null && (
+        {this.state.contacts !== null && (
           <Accordion
             sections={this.state.contacts}
             activeSections={this.state.activeSections}
@@ -141,13 +139,20 @@ export default class Contacts extends Component {
             onChange={this._updateSections}
           />
         )}
-
-        {/* {
-					this.state.user.contacts === null &&
-					<View>
-						<Text>Escane a tu primer contacto!</Text>
-					</View>
-				} */}
+        {this.state.contacts.length === 0 && (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <SvgUri
+              width="150"
+              height="150"
+              source={require("../../resources/svg/qr.svg")}
+            />
+            <Text style={{ color: "white", marginTop: 20 }}>
+              Escane a tu primer contacto!
+            </Text>
+          </View>
+        )}
       </View>
     );
   }
