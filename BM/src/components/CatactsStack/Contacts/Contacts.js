@@ -3,6 +3,7 @@
 import React, { Component } from "react";
 import io from "socket.io-client";
 import { URL } from "../../utils/utils";
+import { SearchBar } from "react-native-elements";
 
 import {
   StyleSheet,
@@ -32,7 +33,8 @@ export default class Contacts extends Component {
     AsyncStorage.getItem("userToken")
       .then(token => apiBack.GetContactOfUsers(token))
       .then(user => {
-        this.setState({ ...this.state, user: user, contacts: user.contacts });
+        var meetups = _.uniq(_.map(user.contacts, 'meetup'))
+        this.setState({ ...this.state, user: user, contacts: user.contacts, headerMeetups: meetups });
       });
   };
 
@@ -42,7 +44,8 @@ export default class Contacts extends Component {
       token: null,
       activeSections: [],
       user: null,
-      contacts: []
+      contacts: [],
+      headerMeetups: null,
     };
 
     this.contacts = [];
@@ -52,15 +55,16 @@ export default class Contacts extends Component {
     this.socket.on("updateContactList", newContactData => {
       console.log(newContactData);
       if (_.includes(newContactData, this.state.user.id)) {
-        AsyncStorage.getItem("userToken")
-          .then(token => {
-            console.log(token)
-            apiBack.GetContactOfUsers(token)
-            .then(user => {
-              apiBack.GetContactOfUsers(user.access_token)
-              .then(userUpdated => this.setState({...this.state, contacts: userUpdated.contacts}))
-            })
-          })
+        AsyncStorage.getItem("userToken").then(token => {
+          console.log(token);
+          apiBack.GetContactOfUsers(token).then(user => {
+            apiBack
+              .GetContactOfUsers(user.access_token)
+              .then(userUpdated =>
+                this.setState({ ...this.state, contacts: userUpdated.contacts })
+              );
+          });
+        });
       }
     });
   }
@@ -117,6 +121,12 @@ export default class Contacts extends Component {
   render() {
     return (
       <View style={styles.container}>
+        {/* <SearchBar
+          onChangeText={() => {}}
+          onClearText={() => {}}
+          containerStyle={{marginTop:40}}
+          placeholder="Type Here..."
+        /> */}
         <TouchableHighlight
           onPress={() => this.props.navigation.navigate("Home")}
         >
@@ -128,16 +138,18 @@ export default class Contacts extends Component {
             />
           </View>
         </TouchableHighlight>
-
         {this.state.contacts !== null && (
-          <Accordion
-            sections={this.state.contacts}
-            activeSections={this.state.activeSections}
-            renderSectionTitle={this._renderSectionTitle}
-            renderHeader={this._renderHeader}
-            renderContent={this._renderContent}
-            onChange={this._updateSections}
-          />
+          <View>
+            {this.state.contacts.map(contact => this._renderContent(contact))}
+          </View>
+          // <Accordion
+          //   sections={this.state.contacts}
+          //   activeSections={this.state.activeSections}
+          //   renderSectionTitle={this._renderSectionTitle}
+          //   renderHeader={this._renderHeader}
+          //   renderContent={this._renderContent}
+          //   onChange={this._updateSections}
+          // />
         )}
         {this.state.contacts.length === 0 && (
           <View
@@ -187,7 +199,8 @@ const styles = StyleSheet.create({
     height: 150
   },
   header: {
-    marginTop: "50%"
+    marginTop: "50%",
+    width: 500
   },
   header1: {
     fontFamily: "Helvetica",
@@ -210,6 +223,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   headerEvent: {
+    width: 300,
     fontFamily: "Helvetica",
     fontWeight: "normal",
     letterSpacing: 1.2,
@@ -223,7 +237,8 @@ const styles = StyleSheet.create({
     marginRight: "10%"
   },
   arrow: {
-    marginTop: "23%",
+    marginTop: "5%",
+    marginBottom: "5%",
     marginLeft: "6%"
   },
   name: {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export const URL = "http://192.168.1.66:3000";
+export const URL = "https://app-bm.herokuapp.com";
 
 export const BMCards = [
   require("../resources/images/BMCard/qr1.jpg"),

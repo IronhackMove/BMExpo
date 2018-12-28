@@ -155,7 +155,7 @@ export default class Home extends React.Component {
         });
       });
 
-      const meets = await apiBack.SaveMeetups(token, meetupsIfError);
+      const meets = await apiBack.SaveMeetups(token, meetups);
 
       joinMeetups.unshift(iron);
       joinMeetups.unshift({});
@@ -165,7 +165,7 @@ export default class Home extends React.Component {
         token: token,
         location: position.coords,
         user: userProfile.data,
-        events: meetupsIfError,
+        events: joinMeetups,
         loadingContent: false
       });
     } catch (error) {
