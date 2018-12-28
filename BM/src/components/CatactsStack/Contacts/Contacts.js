@@ -10,6 +10,7 @@ import {
   Text,
   View,
   Image,
+  ScrollView,
   AsyncStorage,
   TouchableHighlight
 } from "react-native";
@@ -33,8 +34,14 @@ export default class Contacts extends Component {
     AsyncStorage.getItem("userToken")
       .then(token => apiBack.GetContactOfUsers(token))
       .then(user => {
-        var meetups = _.uniq(_.map(user.contacts, 'meetup'))
-        this.setState({ ...this.state, user: user, contacts: user.contacts, headerMeetups: meetups });
+        var meetups = _.uniq(_.map(user.contacts, "meetup"));
+        console.log(meetups);
+        this.setState({
+          ...this.state,
+          user: user,
+          contacts: _.groupBy(user.contacts, "meetup"),
+          headerMeetups: meetups
+        });
       });
   };
 
@@ -45,7 +52,7 @@ export default class Contacts extends Component {
       activeSections: [],
       user: null,
       contacts: [],
-      headerMeetups: null,
+      headerMeetups: []
     };
 
     this.contacts = [];
@@ -74,7 +81,7 @@ export default class Contacts extends Component {
       <View>
         <View style={styles.event}>
           <View style={styles.header}>
-            <Text style={styles.headerEvent}>{item.meetup}</Text>
+            <Text style={styles.headerEvent}>{item}</Text>
           </View>
           <View style={(width = "100%")}>
             <View style={{ marginRight: 20 }}>
@@ -86,6 +93,11 @@ export default class Contacts extends Component {
               />
             </View>
           </View>
+        </View>
+        <View style={{marginTop: 10}}>
+          {this.state.contacts[item].map(contact =>
+            this._renderContent(contact)
+          )}
         </View>
       </View>
     );
@@ -120,59 +132,67 @@ export default class Contacts extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        {/* <SearchBar
+      <ScrollView>
+        <View style={styles.container}>
+          {/* <SearchBar
           onChangeText={() => {}}
           onClearText={() => {}}
           containerStyle={{marginTop:40}}
           placeholder="Type Here..."
         /> */}
-        <TouchableHighlight
-          onPress={() => this.props.navigation.navigate("Home")}
-        >
-          <View style={styles.arrow}>
-            <SvgUri
-              width="20"
-              height="20"
-              source={require("../../resources/svg/arrow.svg")}
-            />
-          </View>
-        </TouchableHighlight>
-        {this.state.contacts !== null && (
-          <View>
-            {this.state.contacts.map(contact => this._renderContent(contact))}
-          </View>
-          // <Accordion
-          //   sections={this.state.contacts}
-          //   activeSections={this.state.activeSections}
-          //   renderSectionTitle={this._renderSectionTitle}
-          //   renderHeader={this._renderHeader}
-          //   renderContent={this._renderContent}
-          //   onChange={this._updateSections}
-          // />
-        )}
-        {this.state.contacts.length === 0 && (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          <TouchableHighlight
+            onPress={() => this.props.navigation.navigate("Home")}
           >
-            <SvgUri
-              width="150"
-              height="150"
-              source={require("../../resources/svg/qr.svg")}
-            />
-            <Text style={{ color: "white", marginTop: 20 }}>
-              Escane a tu primer contacto!
-            </Text>
-          </View>
-        )}
-      </View>
+            <View style={styles.arrow}>
+              <SvgUri
+                width="20"
+                height="20"
+                source={require("../../resources/svg/arrow.svg")}
+              />
+            </View>
+          </TouchableHighlight>
+          {this.state.contacts !== null && (
+            <View>
+              {Object.keys(this.state.contacts).map(meetup =>
+                this._renderHeader(meetup)
+              )}
+            </View>
+            // <Accordion
+            //   sections={this.state.contacts}
+            //   activeSections={this.state.activeSections}
+            //   renderSectionTitle={this._renderSectionTitle}
+            //   renderHeader={this._renderHeader}
+            //   renderContent={this._renderContent}
+            //   onChange={this._updateSections}
+            // />
+          )}
+          {this.state.contacts.length === 0 && (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <SvgUri
+                width="150"
+                height="150"
+                source={require("../../resources/svg/qr.svg")}
+              />
+              <Text style={{ color: "white", marginTop: 20 }}>
+                Escane a tu primer contacto!
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
+    height: "200%",
     backgroundColor: "black",
     color: "white"
   },
@@ -181,7 +201,8 @@ const styles = StyleSheet.create({
   },
   positionNameText: {
     marginTop: "5%",
-    marginRight: "10%"
+    marginRight: "10%",
+    marginBottom: "5%"
   },
   content: {
     flex: 0,
@@ -196,7 +217,7 @@ const styles = StyleSheet.create({
     marginTop: "0%",
     marginLeft: "-5%",
     width: "28%",
-    height: 150
+    height: 100
   },
   header: {
     marginTop: "50%",
