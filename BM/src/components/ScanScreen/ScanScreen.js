@@ -9,13 +9,19 @@ import {
   TouchableOpacity,
   View,
   Linking,
-  Dimensions,
+  Dimeions,
   AsyncStorage,
   StatusBar,
-  Vibration
+  Vibration,
+  Dimensions,
+  AppStore
 } from "react-native";
 
 import ModalNewContact from "./ModalNewContact";
+
+const { height, width } = Dimensions.get("window");
+
+const maskColWidth = (width - 300) / 2;
 
 // import QRCodeScanner from "react-native-qrcode-scanner";
 
@@ -30,7 +36,7 @@ export default class ScanScreen extends Component {
       qrStatus: true,
       contactUser: null,
       hasCameraPermission: null,
-      cameraReady: true
+      cameraReady: false
     };
   }
 
@@ -94,15 +100,21 @@ export default class ScanScreen extends Component {
   };
 
   onSuccess(e) {
-    apiBack.GetContactInfo(e.data).then(contact => {
-      Vibration.vibrate(500);
-      this.setState({
-        ...this.state,
-        contactUser: contact.data,
-        qrStatus: false,
-        isModalVisible: true
+    if (this.state.cameraReady) {
+      apiBack.GetContactInfo(e.data).then(contact => {
+        Vibration.vibrate(500);
+        this.setState({
+          ...this.state,
+          contactUser: contact.data,
+          qrStatus: false,
+          isModalVisible: true,
+          cameraReady: false
+        });
       });
-    });
+    } else {
+      this.setState({...this.state, cameraReady: true})
+    }
+
   }
 
   renderButton = (text, onPress) => (
@@ -114,6 +126,11 @@ export default class ScanScreen extends Component {
   );
 
   render() {
+
+    const { height, width } = Dimensions.get('window');
+    const maskRowHeight = Math.round((Dimensions.get('window').height - 200) / 20);
+    const maskColWidth = (width - 200) / 2;
+
     return (
       <React.Fragment>
         {this.state.contactUser !== null && (
@@ -139,15 +156,39 @@ export default class ScanScreen extends Component {
             </Text>
           ) : (
             <View>
-              {this.state.cameraReady !== false && (
                 <BarCodeScanner
                   onBarCodeRead={this.onSuccess.bind(this)}
                   style={{
                     height: Dimensions.get("window").height,
                     width: Dimensions.get("window").width
                   }}
-                />
-              )}
+                >
+                  <View style={styles.maskOutter}>
+                    <View
+                      style={[
+                        { flex: maskRowHeight },
+                        styles.maskRow,
+                        styles.maskFrame
+                      ]}
+                    />
+                    <View style={[{ flex: 30 }, styles.maskCenter]}>
+                      <View
+                        style={[{ width: maskColWidth }, styles.maskFrame]}
+                      />
+                      <View style={styles.maskInner} />
+                      <View
+                        style={[{ width: maskColWidth }, styles.maskFrame]}
+                      />
+                    </View>
+                    <View
+                      style={[
+                        { flex: maskRowHeight },
+                        styles.maskRow,
+                        styles.maskFrame
+                      ]}
+                    />
+                  </View>
+                </BarCodeScanner>
             </View>
           )}
 
@@ -207,5 +248,34 @@ const styles = StyleSheet.create({
   },
   scrollableModal: {
     height: 300
-  }
+  },
+  container: {
+    flex: 1,
+  },
+  cameraView: {
+    flex: 1,
+    justifyContent: 'flex-start',
+  },
+  maskOutter: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  maskInner: {
+    width: 300,
+    backgroundColor: 'transparent',
+    borderColor: 'white',
+    borderWidth: 1,
+  },
+  maskFrame: {
+    backgroundColor: 'rgba(1,1,1,0.6)',
+  },
+  maskRow: {
+    width: '100%',
+  },
+  maskCenter: { flexDirection: 'row' },
 });

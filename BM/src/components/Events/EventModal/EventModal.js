@@ -11,6 +11,7 @@ import {
   TouchableHighlight
 } from "react-native";
 
+import { Icon } from "react-native-elements";
 import SvgUri from "react-native-svg-uri";
 
 import { Days } from "../../utils/utils";
@@ -22,13 +23,10 @@ function wp(percentage) {
   return Math.round(value);
 }
 
-function strip_html_tags(str)
-{
-   if ((str===null) || (str===''))
-       return false;
-  else
-   str = str.toString();
-  return str.replace(/<[^>]*>/g, '');
+function strip_html_tags(str) {
+  if (str === null || str === "") return false;
+  else str = str.toString();
+  return str.replace(/<[^>]*>/g, "");
 }
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
@@ -46,7 +44,6 @@ export default class App extends Component {
     };
   }
   render() {
-
     return (
       <Modal
         animationType="fade"
@@ -95,7 +92,7 @@ export default class App extends Component {
                 </Text>
               </View>
             ) : (
-              <View style={{marginBottom: 100}} />
+              <View style={{ marginBottom: 100 }} />
             )}
 
             <View style={styles.boxOption2}>
@@ -117,6 +114,11 @@ export default class App extends Component {
                 {strip_html_tags(this.props.eventSelected.description)}
               </Text>
             </View>
+            <View style={styles.boxOption3}>
+              <Icon name="check" type="evilicon" color="white" size={60} />
+              <Icon name="close-o" type="evilicon" color="white" size={60}/>
+
+            </View>
           </ScrollView>
         )}
       </Modal>
@@ -129,6 +131,9 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "black",
     color: "white"
+  },
+  icon:{
+    fontSize:30
   },
   imagePerfil: {
     marginLeft: "43%"
@@ -152,6 +157,13 @@ const styles = StyleSheet.create({
   },
   boxOption2: {
     marginTop: 30,
+    marginLeft: "6%",
+    marginRight: "6%"
+  },
+  boxOption3: {
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "center",
     marginLeft: "6%",
     marginRight: "6%"
   },

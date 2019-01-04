@@ -48,6 +48,12 @@ const apiBack = {
       .then(response => response.data);
   },
 
+  AddTag: (token, idContact , tags) => {
+    return axios
+    .post(`${URL}/auth/addTags/`, {token: token, idContact: idContact, tags: tags})
+      .then(response => response.data);
+  },
+
   GetContactNote: (idContact) => {
     return axios
     .get(`${URL}/auth/getContactNote/${idContact}`)

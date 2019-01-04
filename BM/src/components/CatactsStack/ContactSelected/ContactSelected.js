@@ -15,7 +15,7 @@ import {
 
 import SvgUri from "react-native-svg-uri";
 import ViewMoreText from "react-native-view-more-text";
-
+import Tags from "react-native-tags";
 import apiBack from "../../api/apiBack";
 
 function wp(percentage) {
@@ -42,7 +42,8 @@ export default class ContactSelected extends Component {
       userId: null,
       contactId: this.props.navigation.state.params.idContact,
       contactSelected: null,
-      note: ""
+      note: "",
+      tags: []
     };
   }
 
@@ -59,6 +60,17 @@ export default class ContactSelected extends Component {
       this.state.note
     );
   }
+
+  AddTag() {
+   
+    apiBack.AddTag(
+      this.state.userToken,
+      this.state.contactId,
+      this.state.tags
+    ).then(() => this.props.navigation.state.params.list)
+  }
+
+  
 
   loadAppInformation = async () => {
     try {
@@ -82,14 +94,20 @@ export default class ContactSelected extends Component {
         note: "";
       }
 
-      console.log(note);
+      
+      tagsFound = userProfile.data.contacts.filter(
+        contact => contact.contact === contactInfo.data._id
+      )
+
+      console.log("tags",tagsFound[0].tags);
 
       this.setState({
         ...this.state,
         userToken: token,
         contactSelected: contactInfo.data,
         userId: userProfile.data.id,
-        note: userProfile.data.notes.length > 0 ? note : ""
+        note: userProfile.data.notes.length > 0 ? note : "",
+        tags: tagsFound[0].tags
       });
     } catch (error) {
       console.log(error);
@@ -103,6 +121,11 @@ export default class ContactSelected extends Component {
       receiver: this.state.contactId
     });
   };
+
+  _goBack = () => {
+    this.props.navigation.state.params.list()
+    this.props.navigation.navigate("Contacts")
+  }
 
   render() {
     console.log(this.state.contactId);
@@ -120,7 +143,7 @@ export default class ContactSelected extends Component {
               />
             </View>
 
-            <TouchableHighlight onPress={() => this.props.navigation.pop()}>
+            <TouchableHighlight onPress={() => this._goBack()}>
               <View style={styles.arrow}>
                 <SvgUri
                   width="20"
@@ -205,12 +228,83 @@ export default class ContactSelected extends Component {
                 marginTop: "3%"
               }}
             />
+            <View style={styles.add}>
+              <View>
+                <TouchableHighlight onPress={() => this.AddTag()}>
+                  <SvgUri
+                    width="30"
+                    height="30"
+                    source={require("../../resources/svg//iconAdd.svg")}
+                  />
+                </TouchableHighlight>
+              </View>
+
+              <View
+                style={{ marginLeft: "5%", marginTop: "-1%", width: "100%", height:"100%" }}
+              >
+                <Text style={[styles.text]}>Add tags</Text>
+                <View style={{ width: "80%", height:"100%"}}>
+                  <Tags
+    
+                    textInputProps={{
+                      placeholder: "Any type of animal"
+                    }}
+                    initialTags={this.state.tags}
+                    onChangeTags={tags => this.setState({...this.state, tags: tags})}
+                    tagContainerStyle={{backgroundColor: "white", borderRadius: 1}}
+                    onTagPress={(index, tagLabel, event, deleted) =>
+                      console.log(
+                        index,
+                        tagLabel,
+                        event,
+                        deleted ? "deleted" : "not deleted"
+                      )
+                    }
+                    containerStyle={{ justifyContent: "center" }}
+                    inputStyle={{ color: "white", backgroundColor: "black" }}
+         
+                  />
+                </View>
+
+                {/* <View style={{flex: 1, flexDirection:"column", height: 200}}>
+                  <View>
+                    <TextInput
+                      style={{
+                        height: 40,
+                        width: 200,
+                        color: "white"
+                      }}
+                      onChangeText={text => this.setState({ text })}
+                      value={this.state.text}
+                    />
+                  </View>
+                  <View style={{flexDirection:"row"}}>
+                    <View style={{marginRight:10}}>
+                      <Text style={styles.tag}>Auditoría</Text>
+                    </View>
+                    <View style={{marginRight:10}}>
+                      <Text style={styles.tag}>Finanzas</Text>
+                    </View>
+                  </View>
+                </View> */}
+              </View>
+            </View>
+            <View
+              style={{
+                borderBottomColor: "white",
+                borderBottomWidth: 2,
+                width: "90%",
+                marginLeft: "5%",
+                marginTop: "10%"
+              }}
+            />
             <View
               style={{
                 flexDirection: "row",
                 height: 80,
                 width: "100%",
-                marginTop: 40
+                marginTop: 40,
+                marginBottom: 150
               }}
             >
               <TouchableHighlight
@@ -284,7 +378,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   container: {
-    height: "200%",
+    height: "300%",
     backgroundColor: "black",
     color: "white"
   },
@@ -342,7 +436,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     marginTop: 40,
     marginLeft: "6%",
-    marginRight: "6%"
+    marginRight: "6%",
+    height: 60
   },
   title: {
     fontFamily: "Helvetica",
@@ -389,5 +484,12 @@ const styles = StyleSheet.create({
   },
   slide: {
     height: 500
+  },
+  tag: {
+    fontFamily: "Helvetica",
+    fontWeight: "normal",
+    color: "black",
+    backgroundColor: "white",
+    padding: 5
   }
 });
