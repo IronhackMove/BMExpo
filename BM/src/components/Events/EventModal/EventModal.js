@@ -109,15 +109,16 @@ export default class App extends Component {
                 {this.props.eventSelected.local_time}
               </Text>
             </View>
+            
             <View style={styles.boxOption1}>
               <Text style={styles.text}>
                 {strip_html_tags(this.props.eventSelected.description)}
               </Text>
             </View>
-            <View style={styles.boxOption3}>
-              <Icon name="check" type="evilicon" color="white" size={60} />
-              <Icon name="close-o" type="evilicon" color="white" size={60}/>
 
+            <View style={styles.boxOption3}>
+              <Icon name="check-circle" type="FontAwesome" color="white" size={60} />
+              <Icon name="times-circle" type="FontAwesome" color="white" size={60}/>
             </View>
           </ScrollView>
         )}
