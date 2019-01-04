@@ -9,7 +9,7 @@ import {
   Image,
   AsyncStorage,
   TouchableHighlight,
-  KeyboardAvoidingView,
+  Alert,
   ScrollView
 } from "react-native";
 
@@ -52,13 +52,16 @@ export default class ContactSelected extends Component {
   }
 
   AddContact() {
-    console.log(this.state.userToken, this.state.contactId, this.state.note);
 
     apiBack.AddContactNote(
       this.state.userToken,
       this.state.contactId,
       this.state.note
-    );
+    ).then(() => {
+      Alert.alert(
+        "Note saved!",
+      );
+    })
   }
 
   AddTag() {
@@ -67,7 +70,12 @@ export default class ContactSelected extends Component {
       this.state.userToken,
       this.state.contactId,
       this.state.tags
-    ).then(() => this.props.navigation.state.params.list)
+    ).then(() => {
+      this.props.navigation.state.params.list
+      Alert.alert(
+        "Tags saved!",
+      );
+    })
   }
 
   

@@ -50,7 +50,7 @@ export default class Contacts extends Component {
             apiBack
               .GetContactOfUsers(user.access_token)
               .then(userUpdated =>
-                this.setState({ ...this.state, contacts: userUpdated.contacts })
+                this.setState({ ...this.state, contacts: _.groupBy(userUpdated.contacts, "meetup") })
               );
           });
         });

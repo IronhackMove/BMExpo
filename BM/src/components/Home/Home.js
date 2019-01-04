@@ -154,10 +154,10 @@ export default class Home extends React.Component {
           joinMeetups.push(meet);
         });
       });
-
-      const meets = await apiBack.SaveMeetups(token, meetups);
+ 
 
       joinMeetups.unshift(iron);
+      const meets = await apiBack.SaveMeetups(token, joinMeetups);
       joinMeetups.unshift({});
 
       this.setState({

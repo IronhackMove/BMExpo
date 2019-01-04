@@ -77,10 +77,16 @@ const apiBack = {
       .then(response => response.data);
   },
 
+  CheckIfContactSaved: (userId, contactId) => {
+    var ids = [userId, contactId];
+    console.log(ids)
+    return axios
+      .post(`${URL}/auth/checkContactSaved/`, { ids: ids })
+      .then(response => response.data);
+  },
 
   SaveUserContact: (userId, contactId, meetup) => {
     var ids = [userId, contactId];
-    console.log(ids);
     return axios
       .post(`${URL}/auth/saveContact/`, { ids: ids, meetup: meetup })
       .then(response => response.data);

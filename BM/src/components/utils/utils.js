@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export const URL = "http://192.168.0.105:3000";
+export const URL = "http://192.168.1.66:3000";
 
 export const BMCards = [
   require("../resources/images/BMCard/qr1.jpg"),
